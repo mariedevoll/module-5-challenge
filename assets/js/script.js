@@ -20,7 +20,7 @@ const createTaskCard = (task) => {
    .attr("data-task-id", task.id)
    const cardHeader = $("<div>").addClass("card-header h4").text(task.title);
    const cardBody = $("<div>").addClass("card-body");
-   const cardDescription = $("<p>").addClass("card-text").text(text.description);
+   const cardDescription = $("<p>").addClass("card-text").text(task.description);
    const cardDueDate = $("<p>").addClass("card-text").text(task.dueDate);
    const cardDeleteButton = $("<button>").addClass("btn btn-danger delete").text("delete").attr("data-task-id", task.id);
    cardDeleteButton.on("click", handleDeleteTask);
@@ -36,15 +36,18 @@ const createTaskCard = (task) => {
     } }
    cardBody.append(cardDescription, cardDueDate, cardDeleteButton);
    taskCard.append(cardHeader, cardBody);
-
+   // console.log("Card: ", cardBody);
+   // console.log("Task: ", taskCard);
    return taskCard;
 }
 
 // Todo: create a function to render the task list and make cards draggable
 const renderTaskList = () => {
     if (!taskList) {
-        taskList [];
+        taskList = [];
     }
+    console.log("Dataset: ", taskList);
+
     const todoList = $("#todo-cards");
     todoList.empty();
 
@@ -63,15 +66,19 @@ const renderTaskList = () => {
             doneList.append(createTaskCard(taskList[index]));
         }
     }
-    $(".draggable").draggable({
+    $('.draggable').draggable({
         opacity: 0.7,
         zIndex: 100,
 
         helper: function(event) {
+            console.log("Element: ", event.target);
             let original;
             if($(event.target).hasClass("ui-draggable")) {
                 original = $(event.target).closest(".ui-draggable");
+            } else {
+                $(event.target);
             }
+            console.log("Elem: ", original);
             return original.clone().css({
                 maxWidth: original.outerWidth(),
             });
@@ -92,7 +99,7 @@ const handleAddTask = (event) => {
     }
     taskList.push(task);
     localStorage.setItem("tasks", JSON.stringify(taskList));
-    renterTaskList();
+    renderTaskList();
 
     $("#taskTitle").val("");
     $("#taskDescription").val("");
@@ -110,6 +117,7 @@ function handleDeleteTask(event) {
 
 // Todo: create a function to handle dropping a task into a new status lane
 const handleDrop = (event, ui) => {
+    console.log("Dropping: ", event, ui)
     const taskId = ui.draggable[0].dataset.taskId;
     const newStatus = event.target.id;
 
@@ -129,7 +137,7 @@ $(document).ready(() => {
     $('#taskForm').on("submit", handleAddTask)
 
     $('.lane').droppable({
-        accept: ".draggable",
+        accept: '.draggable',
         drop: handleDrop
     })
 
